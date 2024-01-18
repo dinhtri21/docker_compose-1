@@ -1,0 +1,40 @@
+version: '3'
+
+services:
+  mysql-db:
+    container_name: mysql-db
+    image: dinhtri21/mysql1-sneaker-store-1:latest
+    volumes:
+      - ./data:/var/lib/mysql:rw
+    ports:
+      - "3307:3306"
+    networks:
+      - backend
+    restart: always
+    command: ["mysqld"]
+
+  express-app:
+    container_name: express-app
+    image: dinhtri21/express1-sneaker-store-1:latest
+    depends_on:
+      - mysql-db
+    environment:
+      DB_HOST: mysql-db
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: abc123
+      DB_DATABASE: sneakerstore
+      BASE_URL: $localhost:3001
+      LOCAL_HOST: $localhost
+      REACT_CORS: $localhost:3000
+    ports:
+      - "3001:3001"
+    networks:
+      - backend
+    restart: always
+    command: ["sh", "-c", "sleep 50 && npm start"]
+
+networks:
+  backend:
+    driver: bridge
+  frontend:
